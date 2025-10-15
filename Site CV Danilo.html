@@ -1,0 +1,793 @@
+<!DOCTYPE html><html lang="pt-BR" class="scroll-smooth"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Danilo Moreti do Nascimento - Analista de Tecnologia Big Data</title>
+    <!-- Chosen Palette: Tech Dashboard (Olive Green, Dark Olive Green, Amber) -->    <!-- Application Structure Plan: A responsive dashboard layout with a fixed sidebar for intuitive navigation and a main content area for dynamic sections. This structure was chosen to provide a familiar, organized, and professional user experience, allowing recruiters to easily access key information. The flow starts with a high-level summary (Home) and allows users to drill down into specific areas like Skills and Projects. Interactive elements like modals and tabs são usados para apresentar detailed information without cluttering the main view, enhancing usability. -->    <!-- Visualization & Content Choices:        - Home Stats: Goal=Inform. Method=Key Value Cards. Interaction=Hover scale. Justification=Provides a quick, high-impact summary of key qualifications.        - Hard Skills: Goal=Compare Proficiency. Method=Horizontal Bar Chart. Interaction=Tooltips on hover. Justification=Bar charts are the clearest way to compare skill levels quantitatively. Library=Chart.js (Canvas).        - Soft Skills: Goal=Organize & Show Strengths. Method=Bubble Chart. Interaction=Tooltips on hover. Justification=A bubble chart offers a visually engaging way to represent the relative importance and grouping of qualitative skills. Library=Chart.js (Canvas).        - Timeline: Goal=Show Chronology. Method=Styled HTML/CSS. Interaction=Fade-in on scroll. Justification=A vertical timeline is the most intuitive representation of educational history.        - Projects/Competencies: Goal=Showcase Experience. Method=Grid of Cards. Interaction=Hover reveals details. Justification=Allows for easy scanning of multiple items while providing depth on demand.    -->    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    <script src="https://unpkg.com/lucide@latest"></script>    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/emailjs.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>        :root {            --background-main: #FFFFFF;            --background-secondary: #F5F6F8;            --text-main: #2E2E2E; /* Cor principal de texto (preto/cinza muito escuro) */
+            --accent-1: #88AB75; /* Lighter Green */            --accent-2: #808000; /* Olive Green (Dashboard Tech) */            --accent-3: #f59e0b; /* Amber (Dashboard Tech) */            --border-color: #E5E7EB;            /* Tons Pastéis Suaves */            --pastel-1: #e9f5e1; /* Pastel Green */            --pastel-2: #f1f2e1; /* Pastel Olive */            --pastel-3: #fff3e0; /* Pastel Amber */        }
+        html:not(.dark) {
+            /* NOVO CINZA MÉDIO CLARO - #6A6A6A */
+            --text-secondary: #6A6A6A; 
+        }
+
+        html.dark {            --background-main: #1a1a1a;            --background-secondary: #242424;            --text-main: #F5F6F8;            --border-color: #3f3f46;            --pastel-1: #2f3a28;            --pastel-2: #3a3a2d;            --pastel-3: #433827;
+            /* Garante bom contraste no modo escuro */
+            --text-secondary: #D1D5DB; /* text-gray-300 */
+        }
+        body {            font-family: 'Poppins', sans-serif;            color: var(--text-main);            background-color: var(--background-secondary);            transition: background-color 0.3s, color 0.3s;        }
+        .glassmorphism {            background: rgba(255, 255, 255, 0.2);            backdrop-filter: blur(10px);            -webkit-backdrop-filter: blur(10px);            border: 1px solid rgba(255, 255, 255, 0.3);        }
+        html.dark .glassmorphism {            background: rgba(30, 30, 30, 0.4);            border: 1px solid rgba(255, 255, 255, 0.1);        }
+        .chart-container {            position: relative;            width: 100%;            max-width: 800px;            margin-left: auto;            margin-right: auto;            height: 400px;            max-height: 50vh;        }
+        @media (max-width: 768px) {            .chart-container {                height: 350px;            }        }
+        .fade-in-section {            opacity: 0;            transform: translateY(20px);            transition: opacity 0.6s ease-out, transform 0.6s ease-out;        }
+        .fade-in-section.is-visible {            opacity: 1;            transform: translateY(0);        }
+        .sidebar-link.active {            background-color: var(--accent-1);            color: white;        }         html.dark .sidebar-link.active {            background-color: var(--accent-1);            color: #1a1a1a;        }
+        .skill-tab-btn.active {            border-bottom-width: 2px;            border-color: var(--accent-1);            color: var(--accent-1);        }
+        .filter-btn.active {            border-bottom-width: 2px;            border-color: var(--accent-1);            color: var(--accent-1);        }
+    </style></head><body class="antialiased">
+    <div class="flex min-h-screen">        <!-- Sidebar -->        <aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen bg-[var(--background-main)] shadow-lg transition-transform -translate-x-full sm:translate-x-0">            <div class="flex flex-col h-full p-4">                <div class="text-center mb-8">                    <img src="fotos/danilo-fundodegradelrecort.jpg" alt="Foto de Danilo Moreti" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-[var(--accent-1)] object-cover">                    <h1 class="text-xl font-bold text-[var(--text-main)]">Danilo Moreti</h1>                    <p class="text-sm text-gray-700 dark:text-gray-400">Big Data | IoT | Análise de Dados Pesquisa Agrícola | Tecnologia COA | Mkt Digital | Fotografia Profissional | Designer Gráfico.</p>
+                </div>
+                <nav class="flex-grow">
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="home" class="w-5 h-5 mr-3"></i>Home</a></li>
+                        <li><a href="#sobre" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="user" class="w-5 h-5 mr-3"></i>Sobre Mim</a></li>
+                        <li><a href="#formacao" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="graduation-cap" class="w-5 h-5 mr-3"></i>Formação</a></li>
+                        <li><a href="#experiencia" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="briefcase" class="w-5 h-5 mr-3"></i>Experiência</a></li>
+                        <li><a href="#projetos" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="folder-kanban" class="w-5 h-5 mr-3"></i>Projetos</a></li>
+                        <li><a href="#habilidades" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>Habilidades</a></li>
+                        <li><a href="#cursos" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="book-open" class="w-5 h-5 mr-3"></i>Cursos Complementares</a></li>
+                        <li><a href="#eventos" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="calendar" class="w-5 h-5 mr-3"></i>Eventos e Participações</a></li>
+                        <li><a href="#contato" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"><i data-lucide="mail" class="w-5 h-5 mr-3"></i>Contato</a></li>
+                    </ul>
+                </nav>
+                <div class="mt-auto">                     <div class="flex items-center justify-center space-x-2 mb-4">                        <i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>                        <label for="dark-mode-toggle" class="relative inline-flex items-center cursor-pointer">                          <input type="checkbox" value="" id="dark-mode-toggle" class="sr-only peer">                          <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-1)]"></div>                        </label>                        <i data-lucide="moon" class="w-5 h-5 text-gray-400"></i>                      </div>                    <a href="arquivos/CV Danilo.pdf" target="_blank" class="w-full bg-[var(--accent-1)] text-white text-center py-2 px-4 rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity">                        <i data-lucide="download" class="w-4 h-4 mr-2"></i>                        Baixar CV (PDF)                    </a>
+                </div>
+            </div>
+        </aside>
+        <!-- Mobile Header -->        <header class="sm:hidden fixed top-0 left-0 right-0 z-30 bg-[var(--background-main)]/80 backdrop-blur-sm shadow-md p-2 flex items-center justify-between">            <button id="menu-toggle" class="p-2 rounded-md">                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-lg font-bold">Danilo Moreti</h2>             <img src="fotos/danilo-fundodegradelrecort.jpg" alt="Foto de Danilo Moreti" class="w-12 h-12 rounded-full object-cover">
+        </header>
+        <!-- Main Content -->        <main class="sm:ml-64 w-full p-4 sm:p-8 pt-20 sm:pt-8">            <!-- Home -->            <section id="home" class="min-h-screen flex flex-col justify-center fade-in-section">                <div class="max-w-4xl mx-auto text-center">                    <h2 class="text-4xl md:text-6xl font-bold tracking-tight text-[var(--text-main)] mb-4">Danilo Moreti do Nascimento</h2>                    <h3 class="text-xl md:text-2xl text-[var(--accent-1)] font-semibold mb-6">Inovação e Resultados (Data-Driven) | Comercial, TI e Operações.</h3>                    <p class="text-lg dark:text-gray-300 max-w-2xl mx-auto">                        <span style="color: var(--text-secondary);">“Unindo tecnologia, dados e criatividade para transformar o agronegócio.”</span>                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto w-full">
+                    <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <i data-lucide="briefcase" class="w-10 h-10 text-[var(--accent-1)] mb-4"></i>
+                        <h4 class="text-xl font-bold">Experiência</h4>
+                        <p style="color: var(--text-secondary);" class="dark:text-gray-300">Mais de 10 anos como empreendedor</p>
+                    </div>
+                    <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <i data-lucide="map-pin" class="w-10 h-10 text-[var(--accent-2)] mb-4"></i>
+                        <h4 class="text-xl font-bold">Localização</h4>
+                        <p style="color: var(--text-secondary);" class="dark:text-gray-300">Bebedouro-SP, Brasil</p>
+                    </div>
+                    <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-105">
+                        <i data-lucide="lightbulb" class="w-10 h-10 text-[var(--accent-3)] mb-4"></i>
+                        <h4 class="text-xl font-bold">Foco</h4>
+                        <p style="color: var(--text-secondary);" class="dark:text-gray-300">Big Data, IA, IoT, Design</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Sobre Mim -->            <section id="sobre" class="py-20 fade-in-section">                <div class="max-w-4xl mx-auto">                    <h3 class="text-3xl font-bold mb-8 text-center">Objetivo Profissional e Minha Jornada</h3>                    <div class="bg-[var(--background-main)] p-8 rounded-xl shadow-lg text-center">                        <p class="text-lg leading-relaxed dark:text-gray-300" style="color: var(--text-secondary);">Busco aplicar e expandir meus conhecimentos em Big Data, com ênfase em análise de dados, tecnologia agrícola e Inteligência Artificial (IA), integrando soluções de automação de processos e Internet das Coisas (IoT) para impulsionar a transformação digital no agronegócio.</p>                        <button id="see-more-btn" class="mt-6 bg-[var(--accent-1)] text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity">Ver Detalhes da Trajetória</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Formação Acadêmica -->            <section id="formacao" class="py-20 fade-in-section">                <div class="max-w-4xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center">Formação Acadêmica</h3>                    <div class="relative border-l-2 border-[var(--accent-1)] ml-4">                        <div class="mb-10 ml-8 pl-4 relative">                            <div class="absolute -left-[42px] top-1.5 w-4 h-4 bg-[var(--accent-2)] rounded-full border-4 border-[var(--background-main)]"></div>                            <h4 class="text-xl font-semibold">Curso Superior Tecnólogo em Big Data no Agronegócio</h4>                            <p class="text-md text-gray-700 dark:text-gray-400">Fatec Bebedouro | Penúltimo ano, conclusão prevista para 2026</p>                            <p class="mt-2" style="color: var(--text-secondary);">Foco em Big Data Analytics, IA aplicada, IoT, visualização de dados e ciências agrárias.</p>
+                            <!-- NOVO BOTÃO PARA MODAL DA GRADE -->
+                            <button id="view-curriculum-btn" class="mt-4 text-sm font-medium text-[var(--accent-1)] hover:text-[var(--accent-2)] transition-colors flex items-center">
+                                <i data-lucide="eye" class="w-4 h-4 mr-1"></i>
+                                Ver Grade Curricular
+                            </button>
+                        </div>
+                        <div class="mb-10 ml-8 pl-4 relative">
+                            <div class="absolute -left-[42px] top-1.5 w-4 h-4 bg-[var(--accent-2)] rounded-full border-4 border-[var(--background-main)]"></div>
+                            <h4 class="text-xl font-semibold">Curso Técnico em Web Design (Auxiliar de Informática)</h4>
+                            <p class="text-md text-gray-700 dark:text-gray-400">Etec Bebedouro | 2008 - 2009</p>                             <p class="mt-2" style="color: var(--text-secondary);">Criação de layouts gráficos, identidade visual e design para mídias digitais.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Experiência Profissional -->            <section id="experiencia" class="py-20 fade-in-section">                <div class="max-w-6xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center">Experiência Profissional</h3>                    <div class="relative border-l-2 border-[var(--accent-3)] ml-4">                        <div class="mb-10 ml-8 pl-4 relative">                            <div class="absolute -left-[42px] top-1.5 w-4 h-4 bg-[var(--accent-1)] rounded-full border-4 border-[var(--background-main)]"></div>                            <h4 class="text-xl font-semibold">Empreendedor - Estúdio Fotográfico Próprio</h4>                            <p class="text-md text-gray-700 dark:text-gray-400">2011 - Atualmente</p>                            <p class="mt-2" style="color: var(--text-secondary);">Responsável por todo o processo criativo e técnico em cobertura de feiras agropecuárias, eventos sociais e projetos comerciais. Especialização em edição e processamento de imagens, gestão de acervo digital, e atendimento ao cliente focado em criatividade e inovação visual.</p>
+                        </div>
+                        <div class="mb-10 ml-8 pl-4 relative">
+                            <div class="absolute -left-[42px] top-1.5 w-4 h-4 bg-[var(--accent-1)] rounded-full border-4 border-[var(--background-main)]"></div>
+                            <h4 class="text-xl font-semibold">Fotógrafo e Editor de Imagens</h4>
+                            <p class="text-md text-gray-700 dark:text-gray-400">Foto Chinez | 2006 - 2010</p>                             <p class="mt-2" style="color: var(--text-secondary);">Atuação em vendas consultivas, pós-venda e reestruturação comercial. Produção de conteúdo visual, criação de materiais promocionais e edição digital, contribuindo para o aumento da visibilidade e vendas.</p>
+                        </div>
+                        <div class="mb-10 ml-8 pl-4 relative">
+                            <div class="absolute -left-[42px] top-1.5 w-4 h-4 bg-[var(--accent-1)] rounded-full border-4 border-[var(--background-main)]"></div>
+                            <h4 class="text-xl font-semibold">Office Boy, Vendedor e Fotógrafo</h4>
+                            <p class="text-md text-gray-700 dark:text-gray-400">Cine Foto Jopa | 2004 - 2006</p>                             <p class="mt-2" style="color: var(--text-secondary);">Início da trajetória profissional, promovido de Office Boy a Vendedor/Fotógrafo. Desenvolvimento de habilidades em relacionamento com clientes, negociação e edição de imagem autodidata (Photoshop/Lightroom).</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Projetos Acadêmicos e Tecnológicos -->            <section id="projetos" class="py-20 fade-in-section">                 <div class="max-w-6xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center">Projetos Acadêmicos e Tecnológicos</h3>                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">                        <div class="group bg-[var(--background-main)] p-6 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">                            <h4 class="text-xl font-bold mb-2">Alimentador Automático com IoT</h4>                            <p class="text-gray-700 dark:text-gray-400 mb-4">Sistema inteligente com sensores e Arduino para automação alimentar.</p>                            <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300">                                <p class="text-[var(--text-secondary)] dark:text-gray-300" style="color: var(--text-secondary);">Desenvolvimento de um sistema protótipo para controle e monitoramento otimizado de distribuição de alimentos.</p>
+                            </div>
+                        </div>
+                        <div class="group bg-[var(--background-main)] p-6 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                            <h4 class="text-xl font-bold mb-2">Identificação Inteligente de Gado via RFID</h4>
+                            <p class="text-gray-700 dark:text-gray-400 mb-4">Projeto de leitura e rastreamento de animais.</p>                             <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300">                                 <p class="text-[var(--text-secondary)] dark:text-gray-300" style="color: var(--text-secondary);">Foco na aplicação de tecnologia RFID em conjunto com IoT para monitoramento individualizado e gestão de rebanho.</p>
+                            </div>
+                        </div>                         <div class="group bg-[var(--background-main)] p-6 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">                            <h4 class="text-xl font-bold mb-2">Fotografia Profissional e Gestão de Imagem</h4>                            <p class="text-gray-700 dark:text-gray-400 mb-4">Mais de 10 anos de empreendedorismo e experiência visual.</p>                             <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300">                                 <p class="text-[var(--text-secondary)] dark:text-gray-300" style="color: var(--text-secondary);">Domínio em composição, estética visual, Adobe Photoshop/Lightroom e criação de conteúdo estratégico para redes sociais.</p>
+                            </div>
+                        </div>                         <div class="group bg-[var(--background-main)] p-6 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">                            <h4 class="text-xl font-bold mb-2">Web Design (Técnico)</h4>                            <p class="text-gray-700 dark:text-gray-400 mb-4">Criação de layouts, identidade visual e prototipagem.</p>                             <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300">                                 <p class="text-[var(--text-secondary)] dark:text-gray-300" style="color: var(--text-secondary);">Experiência prática com softwares gráficos para composição visual e prototipagem para mídias digitais.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Habilidades -->            <section id="habilidades" class="py-20 fade-in-section">                <div class="max-w-6xl mx-auto">                    <h3 class="text-3xl font-bold mb-8 text-center">Painel de Habilidades</h3>                    <div class="flex justify-center mb-8 border-b border-[var(--border-color)]">                        <button id="hard-skills-btn" class="skill-tab-btn px-6 py-2 font-semibold">Hard Skills</button>                        <button id="soft-skills-btn" class="skill-tab-btn px-6 py-2 font-semibold text-gray-700 dark:text-gray-400">Soft Skills</button>
+                    </div>
+                    <div id="hard-skills-content" class="skill-content">                         <p class="text-center dark:text-gray-300 mb-8" style="color: var(--text-secondary);">Nível de proficiência nas competências técnicas essenciais para Big Data, IoT e Marketing Visual. As porcentagens são estimativas baseadas na experiência e domínio prático.</p>                         <div class="chart-container">                            <canvas id="hardSkillsChart"></canvas>
+                        </div>                         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">                            <div class="bg-[var(--accent-1)]/20 p-4 rounded-lg text-center font-medium">Big Data Analytics</div>                            <div class="bg-[var(--accent-2)]/20 p-4 rounded-lg text-center font-medium">IA e Automação</div>                            <div class="bg-[var(--accent-3)]/20 p-4 rounded-lg text-center font-medium">Programação de Sensores (IoT)</div>                            <div class="bg-[var(--accent-1)]/20 p-4 rounded-lg text-center font-medium">Edição de Imagens (Adobe)</div>
+                        </div>
+                    </div>
+                    <div id="soft-skills-content" class="skill-content hidden">                         <p class="text-center dark:text-gray-300 mb-8" style="color: var(--text-secondary);">As habilidades interpessoais e cognitivas que fortalecem a colaboração e a inovação. O tamanho da bolha representa a força ou relevância da competência no meu perfil.</p>
+                        <div class="chart-container">
+                            <canvas id="softSkillsChart"></canvas>
+                        </div>                         <div class="flex flex-wrap justify-center gap-3 mt-10">                            <span class="bg-[var(--accent-1)]/30 text-[var(--text-main)] px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform">Criatividade e Inovação</span>                            <span class="bg-[var(--accent-2)]/30 text-[var(--text-main)] px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform">Pensamento Analítico</span>                            <span class="bg-[var(--accent-3)]/30 text-[var(--text-main)] px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform">Aprendizado Contínuo</span>                            <span class="bg-[var(--accent-1)]/30 text-[var(--text-main)] px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform">Interpretação Visual</span>                            <span class="bg-[var(--accent-2)]/30 text-[var(--text-main)] px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform">Comunicação Eficaz</span>                            <span class="bg-[var(--accent-3)]/30 text-[var(--text-main)] px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform">Criação de Prompts para IA</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Cursos Complementares -->            <section id="cursos" class="py-20 fade-in-section">                <div class="max-w-6xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center">Dashboard de Cursos Complementares</h3>
+                    <div class="flex flex-wrap justify-center mb-8 border-b border-[var(--border-color)]">                        <button class="filter-btn active px-4 py-2 font-semibold" data-category="all">Todos</button>                        <button class="filter-btn px-4 py-2 font-semibold text-gray-700 dark:text-gray-400" data-category="Big Data & Banco de Dados">Big Data & Banco de Dados</button>                        <button class="filter-btn px-4 py-2 font-semibold text-gray-700 dark:text-gray-400" data-category="IA & Automação">IA & Automação</button>                        <button class="filter-btn px-4 py-2 font-semibold text-gray-700 dark:text-gray-400" data-category="Agronegócio & Tech">Agronegócio & Tech</button>                        <button class="filter-btn px-4 py-2 font-semibold text-gray-700 dark:text-gray-400" data-category="Design & Fotografia">Design & Fotografia</button>                        <button class="filter-btn px-4 py-2 font-semibold text-gray-700 dark:text-gray-400" data-category="Soft Skills & Gestão">Soft Skills & Gestão</button>                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-semibold mb-4 text-center">Distribuição de Cursos por Área</h4>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-lg">
+                            <h4 class="text-xl font-semibold mb-4 text-center">Horas Totais por Área</h4>
+                            <div class="chart-container">
+                                <canvas id="hoursChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </section>
+            <!-- Eventos e Participações -->            <section id="eventos" class="py-20 fade-in-section">                <div class="max-w-4xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center">Eventos e Participações</h3>                    <div class="space-y-6">                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md">                            <h4 class="font-semibold">Webinar: Inteligência Artificial no Agro Brasileiro – Online (2025)</h4>
+                        </div>
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md">
+                            <h4 class="font-semibold">SOMAR Agro: Dr. Marcos Fava Neves – Mogi Mirim, SP (2019)</h4>
+                        </div>
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md">
+                            <h4 class="font-semibold">Robotic Process Automation & Inteligência Artificial – Uberlândia, MG (2024)</h4>
+                        </div>
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md">
+                            <h4 class="font-semibold">Fórum de Tecnologia – Unifafibe (2009)</h4>
+                        </div>
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md">
+                            <h4 class="font-semibold">Estúdio Brasil – Fotos Still: Gastronomia, Produtos, Models, São Paulo (2011)</h4>
+                        </div>
+                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md">
+                            <h4 class="font-semibold">Wedding Brasil – Fotografia Social e Tecnologias da Imagem – São Paulo (2010)</h4>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Competências Adicionais -->            <section id="competencias" class="py-20 fade-in-section">                <div class="max-w-4xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center">Conhecimentos Práticos</h3>                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">                        <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-110 hover:-translate-y-1">                            <i data-lucide="monitor-dot" class="w-12 h-12 mx-auto text-[var(--accent-1)] mb-3"></i>                            <h4 class="font-semibold">Montagem e Manutenção de PCs</h4>
+                        </div>                         <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-110 hover:-translate-y-1">                            <i data-lucide="settings-2" class="w-12 h-12 mx-auto text-[var(--accent-2)] mb-3"></i>                            <h4 class="font-semibold">Diagnóstico de Hardware</h4>
+                        </div>                         <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-110 hover:-translate-y-1">                            <i data-lucide="database" class="w-12 h-12 mx-auto text-[var(--accent-3)] mb-3"></i>                            <h4 class="font-semibold">Gestão de Acervo Digital</h4>
+                        </div>                         <div class="bg-[var(--background-main)] p-6 rounded-xl shadow-md transition-transform hover:scale-110 hover:-translate-y-1">                            <i data-lucide="globe" class="w-12 h-12 mx-auto text-gray-700 dark:text-gray-400 mb-3"></i>                            <h4 class="font-semibold">Inglês Intermediário</h4>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Contato -->            <section id="contato" class="py-20 fade-in-section">                <div class="max-w-6xl mx-auto">                    <h3 class="text-3xl font-bold mb-12 text-center text-[var(--text-main)]">Conexão Digital: Métricas e Contato</h3>
+                    <!-- Mini-Dashboard KPIs (Key Performance Indicators) -->                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">                        <div class="bg-[var(--pastel-1)] p-6 rounded-xl shadow-md flex items-center justify-between transition-transform hover:scale-[1.02]">                            <div>                                <p class="text-sm font-medium text-[var(--text-main)] dark:text-gray-400">Projetos no Agro (Acadêmicos)</p>                                <h4 class="text-3xl font-bold text-[var(--accent-1)]">3+</h4>
+                            </div>
+                            <i data-lucide="folder-kanban" class="w-8 h-8 text-[var(--accent-1)] opacity-70"></i>
+                        </div>
+                        <div class="bg-[var(--pastel-2)] p-6 rounded-xl shadow-md flex items-center justify-between transition-transform hover:scale-[1.02]">
+                            <div>
+                                <p class="text-sm font-medium text-[var(--text-main)] dark:text-gray-400">Dominio Tech Core</p>
+                                <h4 class="text-3xl font-bold text-[var(--accent-2)]">92%</h4>
+                            </div>
+                            <i data-lucide="bar-chart-3" class="w-8 h-8 text-[var(--accent-2)] opacity-70"></i>
+                        </div>
+                        <div class="bg-[var(--pastel-3)] p-6 rounded-xl shadow-md flex items-center justify-between transition-transform hover:scale-[1.02]">
+                            <div>
+                                <p class="text-sm font-medium text-[var(--text-main)] dark:text-gray-400">Cursos Concluídos (Recentes)</p>
+                                <h4 class="text-3xl font-bold text-[var(--accent-3)]">50+</h4>
+                            </div>
+                            <i data-lucide="award" class="w-8 h-8 text-[var(--accent-3)] opacity-70"></i>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12 items-center">
+                        <!-- Chart Widget -->
+                        <div class="lg:col-span-2 bg-[var(--background-main)] p-6 rounded-xl shadow-lg h-[400px] flex flex-col justify-center">
+                            <h4 class="text-xl font-semibold mb-4 text-center">Foco Tecnológico Principal (Big Data e Agronegócio)</h4>
+                            <div class="chart-container">
+                                <canvas id="focusChart"></canvas>
+                            </div>
+                        </div>
+                        <!-- Contact Action Panel -->
+                        <div class="lg:col-span-1 flex flex-col space-y-4">                             <a href="https://www.linkedin.com/in/danilo-moreti/" target="_blank" class="w-full bg-[var(--pastel-1)] text-[var(--accent-1)] text-center py-4 px-6 rounded-xl shadow-md hover:opacity-80 transition-opacity flex items-center justify-center font-bold text-lg">                                <i data-lucide="linkedin" class="w-6 h-6 mr-3"></i> LinkedIn                            </a>                            <a href="mailto:danilo_moreti@yahoo.com.br" target="_blank" class="w-full bg-[var(--pastel-2)] text-[var(--accent-2)] text-center py-4 px-6 rounded-xl shadow-md hover:opacity-80 transition-opacity flex items-center justify-center font-bold text-lg">                                <i data-lucide="mail" class="w-6 h-6 mr-3"></i> E-mail Direto                            </a>                            <a href="https://wa.me/5517981317527" target="_blank" class="w-full bg-[var(--pastel-3)] text-[var(--accent-3)] text-center py-4 px-6 rounded-xl shadow-md hover:opacity-80 transition-opacity flex items-center justify-center font-bold text-lg">                                <i data-lucide="message-circle" class="w-6 h-6 mr-3"></i> WhatsApp                            </a>
+                        </div>
+                    </div>
+                    <!-- Location remains as simple info -->
+                    <div class="text-center mt-10">
+                        <i data-lucide="map-pin" class="w-8 h-8 mx-auto text-[var(--accent-1)] mb-2"></i>
+                        <p class="text-lg font-semibold text-[var(--text-main)]">Localização: Bebedouro - SP, Brasil</p>
+                    </div>
+                    <!-- NOVO RODAPÉ AQUI -->
+                    <footer class="w-full py-4 pt-10">
+                        <div class="max-w-6xl mx-auto text-center text-xs text-gray-600 dark:text-gray-500">
+                            Projetado e Desenvolvido por Danilo M Nascimento - Todos os direitos reservados.
+                        </div>
+                    </footer>
+                </div>
+            </section>
+        </main>
+        
+    </div>
+    <!-- Modal Sobre Mim -->    <div id="about-modal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">        <div class="bg-[var(--background-main)] rounded-xl shadow-2xl max-w-2xl w-full p-8 relative transform transition-all opacity-0 -translate-y-4">            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-6">Minha Jornada Profissional</h3>
+            <div class="space-y-4 dark:text-gray-100" style="color: var(--text-secondary);">
+                <p>Minha experiência inclui **gestão da informação**, **estratégias de marketing digital** e **comunicação visual**, adquiridas em mais de uma década como fotógrafo profissional, editor de imagens, designer gráfico e empreendedor. Essa vivência fortaleceu minha capacidade de unir dados, tecnologia e marketing, gerando soluções criativas e tecnológicas que otimizam fluxos de trabalho e aumentam a eficiência operacional.</p>
+                <p>Tenho visão analítica, criatividade e foco em crescimento sustentável, contribuindo para a inovação e o desenvolvimento de processos estratégicos, especialmente no setor agrícola, onde busco aplicar e expandir meus conhecimentos em **Big Data, IA e IoT**.</p>
+                <p>A transição foi impulsionada por uma curiosidade inata sobre como as coisas funcionam, o que me levou a explorar hardware, montagem de sistemas e, eventualmente, a programação de sensores e atuadores para projetos de IoT. Foi nesse ponto que percebi o poder contido nos dados gerados por esses sistemas.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL: Grade Curricular Big Data no Agronegócio -->
+    <div id="curriculum-modal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
+        <div class="bg-[var(--background-main)] rounded-xl shadow-2xl max-w-4xl w-full p-8 relative transform transition-all opacity-0 -translate-y-4">
+            <button id="close-curriculum-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 text-center">Grade Curricular: Big Data no Agronegócio (Fatec)</h3>
+            <p class="text-center mb-8 text-sm" style="color: var(--text-secondary);">Estrutura de disciplinas focada na intersecção entre **Tecnologia da Informação (TI)** e o setor **Agrícola**, garantindo uma formação analítica, técnica e de gestão.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Pilar 1: Data Science, Programação e Banco de Dados -->
+                <div>
+                    <h4 class="text-xl font-bold text-[var(--accent-2)] mb-4 flex items-center">
+                        <i data-lucide="server-cog" class="w-6 h-6 mr-2"></i>
+                        Pilar 1: Data Science, Programação e Analytics
+                    </h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i data-lucide="database" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-1)]"></i>
+                            <span style="color: var(--text-secondary);">**Modelagem e Banco de Dados:** Sistemas de Gerenciamento de Banco de Dados (SGBD), NoSQL e Data Warehousing.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="code" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-1)]"></i>
+                            <span style="color: var(--text-secondary);">**Programação Estruturada e Orientada a Objetos:** Linguagens essenciais para desenvolvimento de software e prototipagem.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-1)]"></i>
+                            <span style="color: var(--text-secondary);">**Estatística Aplicada e Cálculo:** Fundamentos matemáticos e estatísticos para modelagem e tomada de decisão.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="cpu" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-1)]"></i>
+                            <span style="color: var(--text-secondary);">**Inteligência Artificial (IA) e Ciência de Dados:** Introdução a algoritmos de Machine Learning e visão computacional.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="cloud" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-1)]"></i>
+                            <span style="color: var(--text-secondary);">**Infraestrutura e Cloud:** Arquitetura de sistemas distribuídos e computação em nuvem (Cloud Computing).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Pilar 2: Agronegócio, IoT e Gestão Estratégica -->
+                <div>
+                    <h4 class="text-xl font-bold text-[var(--accent-2)] mb-4 flex items-center">
+                        <i data-lucide="tractor" class="w-6 h-6 mr-2"></i>
+                        Pilar 2: Aplicação Agrícola e Gestão
+                    </h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i data-lucide="radio" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-3)]"></i>
+                            <span style="color: var(--text-secondary);">**Internet das Coisas (IoT) e Sensores:** Sistemas embarcados, redes de comunicação e coleta de dados em campo.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="map-pin" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-3)]"></i>
+                            <span style="color: var(--text-secondary);">**Geoprocessamento e Agricultura de Precisão:** Mapeamento de lavouras, sensoriamento remoto (drones/satélite) e gestão territorial.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="leaf" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-3)]"></i>
+                            <span style="color: var(--text-secondary);">**Fundamentos de Agronomia:** Disciplinas de base sobre solo, clima, fitopatologia e manejo de culturas.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="trending-up" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-3)]"></i>
+                            <span style="color: var(--text-secondary);">**Gestão e Inteligência de Mercado:** Fundamentos de administração, economia e análise de mercado para o agronegócio.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="rocket" class="w-5 h-5 mt-1 mr-3 text-[var(--accent-3)]"></i>
+                            <span style="color: var(--text-secondary);">**Comunicação Empresarial e Inglês:** Habilidades essenciais para o mercado de trabalho global.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>        
+        // Declaração de variáveis no escopo global para armazenar as instâncias dos gráficos
+        let hardSkillsChartInstance = null;
+        let softSkillsChartInstance = null;
+        let categoryChartInstance = null;
+        let hoursChartInstance = null;
+        let focusChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {            
+            lucide.createIcons();
+            const menuToggle = document.getElementById('menu-toggle');            
+            const sidebar = document.getElementById('sidebar');            
+            menuToggle.addEventListener('click', () => {                
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            const darkModeToggle = document.getElementById('dark-mode-toggle');            
+            darkModeToggle.addEventListener('change', () => {                
+                document.documentElement.classList.toggle('dark');
+            });
+
+            // LÓGICA DO MODAL "SOBRE MIM"
+            const seeMoreBtn = document.getElementById('see-more-btn');            
+            const closeModalBtn = document.getElementById('close-modal-btn');            
+            const aboutModal = document.getElementById('about-modal');            
+            const modalContent = aboutModal.querySelector('div');
+            
+            const openModal = () => {                
+                aboutModal.classList.remove('hidden');                
+                setTimeout(() => {                    
+                    modalContent.classList.remove('opacity-0', '-translate-y-4');                    
+                    modalContent.classList.add('opacity-100', 'translate-y-0');
+                }, 10);
+            };
+            const closeModal = () => {                 
+                modalContent.classList.add('opacity-0', '-translate-y-4');                 
+                modalContent.classList.remove('opacity-100', 'translate-y-0');                
+                setTimeout(() => {                   
+                    aboutModal.classList.add('hidden');
+                }, 300);
+            };
+            
+            seeMoreBtn.addEventListener('click', openModal);            
+            closeModalBtn.addEventListener('click', closeModal);            
+            aboutModal.addEventListener('click', (e) => {                
+                if (e.target === aboutModal) {                    
+                    closeModal();
+                }
+            });
+
+            // LÓGICA DO MODAL "GRADE CURRICULAR"
+            const viewCurriculumBtn = document.getElementById('view-curriculum-btn');
+            const closeCurriculumModalBtn = document.getElementById('close-curriculum-modal-btn');
+            const curriculumModal = document.getElementById('curriculum-modal');
+            const curriculumModalContent = curriculumModal.querySelector('div');
+
+            const openCurriculumModal = () => {
+                curriculumModal.classList.remove('hidden');
+                setTimeout(() => {
+                    curriculumModalContent.classList.remove('opacity-0', '-translate-y-4');
+                    curriculumModalContent.classList.add('opacity-100', 'translate-y-0');
+                }, 10);
+            };
+
+            const closeCurriculumModal = () => {
+                curriculumModalContent.classList.add('opacity-0', '-translate-y-4');
+                curriculumModalContent.classList.remove('opacity-100', 'translate-y-0');
+                setTimeout(() => {
+                    curriculumModal.classList.add('hidden');
+                }, 300);
+            };
+
+            viewCurriculumBtn.addEventListener('click', openCurriculumModal);
+            closeCurriculumModalBtn.addEventListener('click', closeCurriculumModal);
+            curriculumModal.addEventListener('click', (e) => {
+                if (e.target === curriculumModal) {
+                    closeCurriculumModal();
+                }
+            });
+
+
+            const hardSkillsBtn = document.getElementById('hard-skills-btn');            
+            const softSkillsBtn = document.getElementById('soft-skills-btn');            
+            const hardSkillsContent = document.getElementById('hard-skills-content');            
+            const softSkillsContent = document.getElementById('soft-skills-content');
+            
+            hardSkillsBtn.addEventListener('click', () => {                
+                hardSkillsBtn.classList.add('active');                
+                hardSkillsBtn.classList.remove('text-gray-700', 'dark:text-gray-400');                
+                softSkillsBtn.classList.remove('active');                
+                softSkillsBtn.classList.add('text-gray-700', 'dark:text-gray-400');                
+                hardSkillsContent.classList.remove('hidden');                
+                softSkillsContent.classList.add('hidden');
+            });
+            
+            softSkillsBtn.addEventListener('click', () => {                
+                softSkillsBtn.classList.add('active');                
+                softSkillsBtn.classList.remove('text-gray-700', 'dark:text-gray-400');                
+                hardSkillsBtn.classList.remove('active');                
+                hardSkillsBtn.classList.add('text-gray-700', 'dark:text-gray-400');                
+                softSkillsContent.classList.remove('hidden');                
+                hardSkillsContent.classList.add('hidden');
+            });
+            
+            hardSkillsBtn.classList.add('active');
+            
+            const sections = document.querySelectorAll('section');            
+            const navLinks = document.querySelectorAll('.sidebar-link');            
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.4 };
+            
+            const sectionObserver = new IntersectionObserver((entries, observer) => {                
+                entries.forEach(entry => {                    
+                    if (entry.isIntersecting) {                        
+                        const id = entry.target.getAttribute('id');                        
+                        navLinks.forEach(link => {                            
+                            link.classList.remove('active');                            
+                            if (link.getAttribute('href') === `#${id}`) {                                
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            sections.forEach(section => {                
+                sectionObserver.observe(section);
+            });
+            
+            const animationObserver = new IntersectionObserver((entries, observer) => {                
+                entries.forEach(entry => {                    
+                    if (entry.isIntersecting) {                        
+                        entry.target.classList.add('is-visible');                        
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.fade-in-section').forEach(section => {                
+                animationObserver.observe(section);
+            });
+
+            // Paleta de cores pastel revisada (sem lilás/rosa)
+            const pastelChartColors = [
+                '#BEE3A6', // Soft Green
+                '#FFE0B8', // Soft Amber
+                '#A6C4D3', // Soft Blue
+                '#D0D8A0', // Soft Olive
+                '#D3D3D3', // Light Gray
+                '#99C2A2', // Medium Green
+                '#FFB74D', // Medium Amber
+            ];
+
+            const hardSkillsData = {                labels: ['Edição e Tratamento de Imagens', 'Coleta e Análise de Dados', 'Criação de Peças Gráficas', 'Gerenciamento de Dados/Sistemas', 'Visualização de Dados (Python)', 'Inteligência Artificial e Automação', 'Programação de Sensores (IoT)'],                datasets: [{                    label: 'Proficiência',                    data: [100, 95, 92, 90, 88, 85, 80],                    backgroundColor: pastelChartColors.slice(0, 7), // Using the first 7 pastel colors
+                    borderColor: 'rgba(0,0,0,0)',                    borderWidth: 0, // Removida a borda preta
+                }]
+            };
+            
+            const hardSkillsCtx = document.getElementById('hardSkillsChart').getContext('2d');
+            
+            // Destruir instância anterior se existir
+            if (hardSkillsChartInstance) hardSkillsChartInstance.destroy();
+
+            // Criar nova instância e armazená-la
+            hardSkillsChartInstance = new Chart(hardSkillsCtx, {                
+                type: 'bar',                
+                data: hardSkillsData,                
+                options: {                    
+                    indexAxis: 'y',                    
+                    responsive: true,                    
+                    maintainAspectRatio: false,                    
+                    elements: {                        
+                        bar: {                            
+                            borderWidth: 0 // Garante que as barras não tenham borda
+                        }
+                    },
+                    scales: {                        
+                        x: {                            
+                            beginAtZero: true,                            
+                            max: 100,                             
+                            grid: { color: 'rgba(128, 128, 128, 0.2)' }
+                        },
+                        y: {                            
+                            grid: { color: 'rgba(128, 128, 128, 0.1)' }
+                        }
+                    },
+                    plugins: {                        
+                        legend: { display: false },
+                        tooltip: {                            
+                            callbacks: {                                
+                                label: function(context) {                                    
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const softSkillsData = {
+                datasets: [
+                    { label: 'Criatividade e Inovação', data: [{ x: 5, y: 8, r: 30 }], backgroundColor: '#BEE3A6' },
+                    { label: 'Pensamento Analítico', data: [{ x: 2, y: 4, r: 28 }], backgroundColor: '#D0D8A0' },
+                    { label: 'Interpretação Visual', data: [{ x: 8, y: 4, r: 26 }], backgroundColor: '#FFE0B8' },
+                    { label: 'Comunicação Eficaz', data: [{ x: 3, y: 9, r: 24 }], backgroundColor: '#A6C4D3' },
+                    { label: 'Aprendizado Contínuo', data: [{ x: 7, y: 1, r: 23 }], backgroundColor: '#99C2A2' },
+                    { label: 'Adaptabilidade / Flexibilidade', data: [{ x: 1, y: 1, r: 20 }], backgroundColor: '#FFB74D' },
+                    { label: 'Trabalho em Equipe', data: [{ x: 9, y: 8, r: 18 }], backgroundColor: '#A6C4D3' },
+                    { label: 'Criação de Prompts para IA', data: [{ x: 4, y: 6, r: 16 }], backgroundColor: '#D3D3D3' },
+                ],
+            };
+            
+            const softSkillsCtx = document.getElementById('softSkillsChart').getContext('2d');
+            
+            // Destruir instância anterior se existir
+            if (softSkillsChartInstance) softSkillsChartInstance.destroy();
+
+            // Criar nova instância e armazená-la
+            softSkillsChartInstance = new Chart(softSkillsCtx, {                
+                type: 'bubble',                
+                data: softSkillsData,                
+                options: {                    
+                    responsive: true,                    
+                    maintainAspectRatio: false,
+                    elements: {                        
+                        point: {                            
+                            borderWidth: 0 // Remove borda da bolha
+                        }
+                    },
+                    scales: {                        
+                        y: { display: false, min: 0, max: 10 },                        
+                        x: { display: false, min: 0, max: 10 }
+                    },
+                     plugins: {                        
+                         legend: { display: false },
+                        tooltip: {                             
+                            callbacks: {                                
+                                label: function(context) {                                    
+                                    return context.dataset.label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const courses = [
+                // Big Data & Banco de Dados
+                { name: 'Nano Curso de Big Data e Analytics', category: 'Big Data & Banco de Dados', hours: 60, year: 2025, institute: 'FIAP' },
+                { name: 'Big Data 101', category: 'Big Data & Banco de Dados', hours: 3, year: 2025, institute: 'IBM' },
+                { name: 'Introdução à Ciência de Dados', category: 'Big Data & Banco de Dados', hours: 2, year: 2025, institute: 'Serpro/ENAP' },
+                { name: 'Banco de Dados 1: Fundamentos', category: 'Big Data & Banco de Dados', hours: 20, year: 2025, institute: 'IFRS' },
+                
+                // IA & Automação
+                { name: 'Inteligência Artificial no Campo', category: 'IA & Automação', hours: 20, year: 2025, institute: 'Senar' },
+                { name: 'Engenharia de Prompt IA', category: 'IA & Automação', hours: 8, year: 2025, institute: 'Santander Academy/Microsoft' },
+                { name: 'Transformação digital: mapeamento e automação de processos', category: 'IA & Automação', hours: 20, year: 2025, institute: 'ENAP' },
+                { name: 'What Is Generative AI', category: 'IA & Automação', hours: 1, year: 2025, institute: 'LinkedIn' },
+
+                // Agronegócio & Tech
+                { name: 'Greenig', category: 'Agronegócio & Tech', hours: 7, year: 2025, institute: 'Fundecitrus' },
+                { name: 'NR 31.12', category: 'Agronegócio & Tech', hours: 20, year: 2025, institute: 'Senar' },
+                { name: 'Sensoriamento remoto básico e mapeamento com drones', category: 'Agronegócio & Tech', hours: 12, year: 2025, institute: 'Senar' },
+                { name: 'Tecnologias de Aplicação de Defensivos Agrícolas', category: 'Agronegócio & Tech', hours: 2, year: 2025, institute: 'Syngenta' }, // Corrigido para 2h
+                { name: 'Introdução à Agricultura de Precisão', category: 'Agronegócio & Tech', hours: 18, year: 2025, institute: 'SENAR' },
+                
+                // Design & Fotografia
+                { name: 'Photoshop', category: 'Design & Fotografia', hours: 90, year: 2005, institute: 'Compway' },
+                { name: 'Photoshop Intermediário', category: 'Design & Fotografia', hours: 60, year: 2006, institute: 'Kodak' },
+                { name: 'Photoshop Avançado', category: 'Design & Fotografia', hours: 60, year: 2007, institute: 'Fujifilm' },
+                { name: 'Lightroom', category: 'Design & Fotografia', hours: 40, year: 2014, institute: 'Adobe' },
+                { name: 'Fotografia Avançada', category: 'Design & Fotografia', hours: 16, year: 2009, institute: 'Joel Reichert' },
+                { name: 'Presets, Contraste e RAW Processing, Cores', category: 'Design & Fotografia', hours: 8, year: 2014, institute: 'Evandro Rocha' },
+                { name: 'Strobist na Fotografia', category: 'Design & Fotografia', hours: 8, year: 2016, institute: 'Grupo Luz' },
+                { name: 'Composições e Regras na fotografia', category: 'Design & Fotografia', hours: 8, year: 2016, institute: 'Duo Borgatto' },
+                
+                // Soft Skills & Gestão
+                { name: 'Inteligência Emocional', category: 'Soft Skills & Gestão', hours: 50, year: 2025, institute: 'ENAP' },
+                { name: 'Resolução de Problemas Técnicos', category: 'Soft Skills & Gestão', hours: 3, year: 2025, institute: 'IBM SkillsBuild' },
+                { name: 'TI como Elemento Estratégico nas Organizações', category: 'Soft Skills & Gestão', hours: 6, year: 2025, institute: 'FGV Online' },
+            ];
+            
+            const coursesListContainer = document.getElementById('courses-list');            
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            const renderCourses = (category) => {                
+                coursesListContainer.innerHTML = '';                
+                const filteredCourses = category === 'all' ? courses : courses.filter(course => course.category === category);
+                
+                filteredCourses.forEach(course => {                    
+                    // Determina o ano para exibição no card
+                    const yearDisplay = course.year && course.year > 0 ? course.year : 'N/A';
+                    const hoursDisplay = course.hours > 0 ? `${course.hours}h` : 'N/A';
+
+                    const courseCard = `                        <div class="bg-[var(--background-main)] p-5 rounded-lg shadow-md transition-transform hover:scale-105">                            <h5 class="font-bold text-lg">${course.name}</h5>                            <p class="text-sm text-[var(--accent-1)] font-medium my-1">${course.institute} | ${course.category}</p>                            <div class="flex justify-between text-sm" style="color: var(--text-secondary);">                                <span>Carga: ${hoursDisplay}</span>                                <span>Ano: ${yearDisplay}</span>                            </div>                        </div>                    `;                    
+                    coursesListContainer.innerHTML += courseCard;
+                });
+            };
+            
+            filterButtons.forEach(button => {                
+                button.addEventListener('click', () => {                    
+                    filterButtons.forEach(btn => {                        
+                        btn.classList.remove('active');                        
+                        btn.classList.add('text-gray-700', 'dark:text-gray-400');
+                    });
+                    
+                    button.classList.add('active');                    
+                    button.classList.remove('text-gray-700', 'dark:text-gray-400');                    
+                    renderCourses(button.dataset.category);
+                });
+            });
+
+            // Dados e lógica para gráficos baseados nos cursos reais
+            const categoryData = courses.reduce((acc, course) => {                
+                acc[course.category] = (acc[course.category] || 0) + 1;                
+                return acc;
+            }, {});
+            
+            const hoursData = courses.reduce((acc, course) => {                
+                // Só soma se a hora for > 0, ignorando 'N/A' (curso Syngenta)
+                if (course.hours > 0) {
+                    acc[course.category] = (acc[course.category] || 0) + course.hours;
+                } else {
+                    // Garante que a chave exista mesmo que o valor seja 0
+                    if (!(course.category in acc)) {
+                        acc[course.category] = 0;
+                    }
+                }
+                return acc;
+            }, {});
+
+            const courseCategories = Object.keys(categoryData);
+
+            // Cores: Garante que as cores combinem com o número de categorias (5)
+            const chartColors = [
+                '#BEE3A6', // Big Data & Banco de Dados (Soft Green)
+                '#FFE0B8', // IA & Automação (Soft Amber)
+                '#A6C4D3', // Agronegócio & Tech (Soft Blue)
+                '#D0D8A0', // Design & Fotografia (Soft Olive)
+                '#D3D3D3', // Soft Skills & Gestão (Light Gray)
+            ];
+
+            const categoryChartCtx = document.getElementById('categoryChart').getContext('2d');
+            
+            // Destruir instância anterior se existir
+            if (categoryChartInstance) categoryChartInstance.destroy();
+            
+            // Criar nova instância e armazená-la
+            categoryChartInstance = new Chart(categoryChartCtx, {                
+                type: 'doughnut',                
+                data: {                    
+                    labels: courseCategories,                    
+                    datasets: [{                        
+                        data: courseCategories.map(cat => categoryData[cat]),                        
+                        backgroundColor: chartColors,                        
+                        borderColor: 'var(--background-main)', // Borda branca/fundo para o Donut
+                        borderWidth: 2
+                    }]
+                },
+                options: {                    
+                    responsive: true,                    
+                    maintainAspectRatio: false,                    
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                // Força o uso de marcadores como quadrados
+                                usePointStyle: true,
+                                // Define o preenchimento da linha para separar os blocos
+                                padding: 15, 
+                            }
+                        } 
+                    }
+                }
+            });
+            
+            // Lógica para o Gráfico de Horas Totais
+            const hoursChartCtx = document.getElementById('hoursChart').getContext('2d');
+            
+            // Destruir instância anterior se existir
+            if (hoursChartInstance) hoursChartInstance.destroy();
+
+            // Criar nova instância e armazená-la
+            hoursChartInstance = new Chart(hoursChartCtx, {                
+                type: 'bar',                
+                data: {                    
+                    labels: courseCategories,                    
+                    datasets: [{                        
+                        label: 'Horas Totais',                        
+                        data: courseCategories.map(cat => hoursData[cat]),                        
+                        backgroundColor: chartColors,
+                        borderColor: 'rgba(0,0,0,0)', // Sem borda para as barras
+                        borderWidth: 0,
+                    }]
+                },
+                options: {                    
+                    responsive: true,                    
+                    maintainAspectRatio: false,                    
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            // Mantém o max em 320 para destacar Design & Fotografia (302)
+                            max: 320, 
+                            ticks: {
+                                stepSize: 50 
+                            }
+                        } 
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}h`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico para a seção Contato (Focus Chart) - Polar Area
+            const focusChartData = {
+                labels: ['Big Data & Analytics', 'IA & Automação', 'Agronegócio & Tech', 'Comunicação Visual/Design'],
+                datasets: [{
+                    // Dados simulados baseados no objetivo profissional (40/30/20/10)
+                    data: [40, 30, 20, 10], 
+                    backgroundColor: ['#BEE3A6', '#D0D8A0', '#FFE0B8', '#A6C4D3'], // Subset de pastéis
+                    borderColor: 'rgba(0,0,0,0)', // Sem borda para a área polar
+                    borderWidth: 0
+                }]
+            };
+
+            const focusChartCtx = document.getElementById('focusChart').getContext('2d');
+            
+            // Destruir instância anterior se existir
+            if (focusChartInstance) focusChartInstance.destroy();
+
+            // Criar nova instância e armazená-la
+            focusChartInstance = new Chart(focusChartCtx, {
+                type: 'polarArea', 
+                data: focusChartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            pointLabels: {
+                                display: true,
+                                centerPointLabels: true,
+                                font: { size: 14 }
+                            },
+                            grid: { color: 'rgba(128, 128, 128, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de Hard Skills (Horizontal Bar) - A instância já foi criada no início e está em hardSkillsChartInstance
+            // Não precisamos de um novo bloco de criação aqui, pois o código Hard Skills e Soft Skills no início do script já está correto.
+            // Para garantir que o último gráfico de hard skills esteja correto:
+            // Ele foi reescrito no início do script para hardSkillsChartInstance.
+
+            renderCourses('all');        
+        });    
+    </script></body></html>
